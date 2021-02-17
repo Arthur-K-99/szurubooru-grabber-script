@@ -57,7 +57,7 @@ for tag_name in tag_category_map.keys():
         if req.json()['name'] == 'TagNotFoundError':
             request_input = {
                 "names": tag_name,
-                "category": tag_and_category[tag_name]
+                "category": tag_category_map[tag_name]
             }
             json_input = json.dumps(request_input)
             req = requests.post(f'{api_url}/tags', headers=headers, data=json_input)
@@ -79,5 +79,5 @@ multipart_form_data = {
 
 r = requests.post(f'{api_url}/posts/', headers=headers, files=multipart_form_data)
 
-# with open('output.txt', 'w') as f:
-#     f.write(r.text)
+with open('output.txt', 'w') as f:
+    f.write(r.text)
