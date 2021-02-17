@@ -27,18 +27,37 @@ ratingsMap = {
 }
 
 # Split the tags to seperate the name from the category
-# The join/split in tag_name handles tag names which have ':' in them, like Re:Zero etc. 
-tag_name = [':'.join(i.split(':')[1:]) for i in sys.argv[1].split()]
-tag_category = [i.split(':')[0] for i in sys.argv[1].split()]
+original_tags = sys.argv[1].split()
+tag_category_map = {}
+for tag_and_category in original_tags:
+    cat, *tag = tag_and_category.split(":")
+    if isinstance(tag, list):
+        tag = ':'.join(tag)
+    tag_category_map[tag] = cat
+
+# Checks if the tag category exist/create it
+for tag_category in tag_category_map.values():
+    req = requests.get(f'{api_url}/tag-category/{quote(tag_category)}', headers=headers)
+    try:
+        if req.json()['name'] == 'TagCategoryNotFoundError':
+            request_input = {
+                "name": tag_category,
+                "color": "#00ffff",
+                "order": 1
+            }
+            json_input = json.dumps(request_input)
+            req = requests.post(f'{api_url}/tag-categories', headers=headers, data=json_input)
+    except:
+        ...
 
 # Checks if the tag exists and if not creates it so it has the correct category
-for tag_name, tag_category in zip(tag_name, tag_category):
+for tag_name in tag_category_map.keys():
     req = requests.get(f'{api_url}/tag/{quote(tag_name)}', headers=headers)
     try:
         if req.json()['name'] == 'TagNotFoundError':
             request_input = {
                 "names": tag_name,
-                "category": tag_category
+                "category": tag_and_category[tag_name]
             }
             json_input = json.dumps(request_input)
             req = requests.post(f'{api_url}/tags', headers=headers, data=json_input)
@@ -47,7 +66,7 @@ for tag_name, tag_category in zip(tag_name, tag_category):
 
 # The data to be sent alongside the file
 metadata = {
-    "tags": [':'.join(i.split(':')[1:]) for i in sys.argv[1].split()],
+    "tags": list(tag_category_map.keys()),
     "safety": ratingsMap[sys.argv[2]],
     "source": sys.argv[3]
 }
@@ -58,7 +77,7 @@ multipart_form_data = {
     'metadata': json.dumps(metadata),
 }
 
-r = requests.post('http://localhost:8080/api/posts/', headers=headers, files=multipart_form_data)
+r = requests.post(f'{api_url}/posts/', headers=headers, files=multipart_form_data)
 
-with open('output.txt', 'w') as f:
-    f.write(r.text)
+# with open('output.txt', 'w') as f:
+#     f.write(r.text)
