@@ -19,6 +19,7 @@ A script to automate uploading images, along with their data, to a szurubooru im
 
 ## Warnings
 * The script doesn't automatically delete the images after they are saved so keep that in mind.
+* Used tag categories should already exist (To be done)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
