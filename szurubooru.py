@@ -48,7 +48,8 @@ for tag_name, tag_category in zip(tag_name, tag_category):
 # The data to be sent alongside the file
 metadata = {
     "tags": [':'.join(i.split(':')[1:]) for i in sys.argv[1].split()],
-    "safety": ratingsMap[sys.argv[2]]
+    "safety": ratingsMap[sys.argv[2]],
+    "source": sys.argv[3]
 }
 
 # The whole data
