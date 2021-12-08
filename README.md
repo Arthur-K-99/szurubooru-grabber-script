@@ -17,6 +17,10 @@ A script to automate uploading images, along with their data, to a szurubooru im
 3. Open **Grabber**, go to **Tools**, go to **Options (Ctrl-P)**, then **Commands** and in the image field enter: <br /> ```python szurubooru.py "%all:includenamespace,unsafe,underscores%" "%rating%" "%source:unsafe%" "%path%"```
 4. Just save an image anywhere and it should automatically be uploaded to your szurubooru server.
 
+## Notes
+1. There should be an **output.txt** file in the root directory of **Grabber** with the JSON response of the webserver. Use it for troubleshooting.
+2. If there is no **output.txt**, check the **Grabber logs** to make sure the script is run. If there's an error try running the Grabber executable from the **root directory with admin rights**.
+
 ## Warnings
 * The script doesn't automatically delete the images after they are saved so keep that in mind.
 
