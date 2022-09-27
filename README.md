@@ -8,8 +8,8 @@ A script to automate uploading images, along with their data, to a szurubooru im
 
 ## Requirements
 
-* Python 3 (>=3.6)
-* Requests (`pip install requests`)
+* Python 3 (Latest Version is the best but should work >=3.8)
+* Requests (`pip install requests` or use `pip install -r requirements.txt` in the root folder)
 * [Grabber](https://github.com/Bionus/imgbrd-grabber)
   
 ## Usage
