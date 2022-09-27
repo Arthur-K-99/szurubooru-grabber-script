@@ -22,12 +22,15 @@ ratingsMap = {
 
 # Headers required by the API to process requests
 headers = {
-    'Authorization': 'Token ' + base64.b64encode(f'{username}:{login_token}'.encode('ascii')).decode('ascii'),
+    'Authorization': 'Token ' + base64.b64encode(
+        f'{username}:{login_token}'.encode('ascii')
+    ).decode('ascii'),
     'Accept': 'application/json'
 }
 
 # This is the command Grabber will run:
-# python szurubooru.py "%all:includenamespace,unsafe,underscores%" "%rating%" "%source:unsafe%" "%path:nobackslash%"
+# python szurubooru.py
+# "%all:includenamespace,unsafe,underscores%" "%rating%" "%source:unsafe%" "%path:nobackslash%"
 
 # Split the tags to seperate the tag from the category
 original_tags = sys.argv[1].split()
@@ -50,7 +53,7 @@ for tag_category in tag_category_map.values():
             }
             json_input = json.dumps(request_input)
             req = requests.post(f'{api_url}/tag-categories', headers=headers, data=json_input)
-    except:
+    finally:
         ...
 
 # Checks if the tag exists and if not creates it so it has the correct category
@@ -64,7 +67,7 @@ for tag_name in tag_category_map.keys():
             }
             json_input = json.dumps(request_input)
             req = requests.post(f'{api_url}/tags', headers=headers, data=json_input)
-    except:
+    finally:
         ...
 
 # The data to be sent alongside the file
