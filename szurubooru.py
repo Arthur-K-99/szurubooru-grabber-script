@@ -1,23 +1,17 @@
+import base64
+import configparser
+import json
 import sys
 import requests
-import json
 from urllib.parse import quote
-import base64
 
-# Required User Input
-username = ''
-token = ''
-api_url = 'http://localhost:8080/api'
+# Reading config file for user details
+config = configparser.ConfigParser()
+config.read('config.ini')
 
-# Authentication Headers
-auth_message = f'{username}:{token}'
-auth_message_ascii = auth_message.encode('ascii')
-auth_message_base64 = base64.b64encode(auth_message_ascii)
-auth_message_decoded = auth_message_base64.decode('ascii')
-headers = {
-    'Authorization': 'Token ' + auth_message_decoded,
-    'Accept': 'application/json'
-}
+username = config.get('API', 'username')
+login_token = config.get('API', 'token')
+api_url = config.get('API', 'api_url')
 
 # Szurubooru uses different safety categories so we map them to the usual ones
 ratingsMap = {
@@ -26,7 +20,16 @@ ratingsMap = {
     "explicit": "unsafe",
 }
 
-# Split the tags to seperate the name from the category
+# Headers required by the API to process requests
+headers = {
+    'Authorization': 'Token ' + base64.b64encode(f'{username}:{login_token}'.encode('ascii')).decode('ascii'),
+    'Accept': 'application/json'
+}
+
+# This is the command Grabber will run:
+# python szurubooru.py "%all:includenamespace,unsafe,underscores%" "%rating%" "%source:unsafe%" "%path:nobackslash%"
+
+# Split the tags to seperate the tag from the category
 original_tags = sys.argv[1].split()
 tag_category_map = {}
 for tag_and_category in original_tags:
@@ -77,7 +80,7 @@ multipart_form_data = {
     'metadata': json.dumps(metadata),
 }
 
-r = requests.post(f'{api_url}/posts/', headers=headers, files=multipart_form_data)
-
-with open('output.txt', 'w') as f:
-    f.write(r.text)
+if __name__ == '__main__':
+    r = requests.post(f'{api_url}/posts/', headers=headers, files=multipart_form_data)
+    with open('output.txt', 'w') as f:
+        f.write(r.text)
