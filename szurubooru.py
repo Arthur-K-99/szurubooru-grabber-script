@@ -1,17 +1,21 @@
+"""
+Script that automatically uploads images to a Szurubooru server when saving in Grabber.
+"""
+
+from urllib.parse import quote
 import base64
 import configparser
 import json
 import sys
 import requests
-from urllib.parse import quote
 
 # Reading config file for user details
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-username = config.get('API', 'username')
+username    = config.get('API', 'username')
 login_token = config.get('API', 'token')
-api_url = config.get('API', 'api_url')
+api_url     = config.get('API', 'api_url')
 
 # Szurubooru uses different safety categories so we map them to the usual ones
 ratingsMap = {
@@ -38,12 +42,12 @@ tag_category_map = {}
 for tag_and_category in original_tags:
     cat, *tag = tag_and_category.split(":")
     if isinstance(tag, list):
-        tag = ':'.join(tag)
-    tag_category_map[tag] = cat
+        TAG = ':'.join(tag)
+    tag_category_map[TAG] = cat
 
 # Checks if the tag category exist/create it
 for tag_category in tag_category_map.values():
-    req = requests.get(f'{api_url}/tag-category/{quote(tag_category)}', headers=headers)
+    req = requests.get(f'{api_url}/tag-category/{quote(tag_category)}', headers=headers, timeout=10)
     try:
         if req.json()['name'] == 'TagCategoryNotFoundError':
             request_input = {
@@ -52,21 +56,22 @@ for tag_category in tag_category_map.values():
                 "order": 1
             }
             json_input = json.dumps(request_input)
-            req = requests.post(f'{api_url}/tag-categories', headers=headers, data=json_input)
+            req = requests.post(f'{api_url}/tag-categories', headers=headers, data=json_input, \
+                timeout=10)
     finally:
         ...
 
 # Checks if the tag exists and if not creates it so it has the correct category
-for tag_name in tag_category_map.keys():
-    req = requests.get(f'{api_url}/tag/{quote(tag_name)}', headers=headers)
+for tag_name, cat in tag_category_map.items():
+    req = requests.get(f'{api_url}/tag/{quote(tag_name)}', headers=headers, timeout=10)
     try:
         if req.json()['name'] == 'TagNotFoundError':
             request_input = {
                 "names": tag_name,
-                "category": tag_category_map[tag_name]
+                "category": cat
             }
             json_input = json.dumps(request_input)
-            req = requests.post(f'{api_url}/tags', headers=headers, data=json_input)
+            req = requests.post(f'{api_url}/tags', headers=headers, data=json_input, timeout=10)
     finally:
         ...
 
@@ -84,6 +89,6 @@ multipart_form_data = {
 }
 
 if __name__ == '__main__':
-    r = requests.post(f'{api_url}/posts/', headers=headers, files=multipart_form_data)
-    with open('output.txt', 'w') as f:
+    r = requests.post(f'{api_url}/posts/', headers=headers, files=multipart_form_data, timeout=10)
+    with open('output.txt', 'w', encoding='utf-8') as f:
         f.write(r.text)
