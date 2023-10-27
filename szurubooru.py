@@ -58,7 +58,7 @@ for tag_category in tag_category_map.values():
             json_input = json.dumps(request_input)
             req = requests.post(f'{api_url}/tag-categories', headers=headers, data=json_input, \
                 timeout=10)
-    finally:
+    except KeyError:
         ...
 
 # Checks if the tag exists and if not creates it so it has the correct category
@@ -72,7 +72,7 @@ for tag_name, cat in tag_category_map.items():
             }
             json_input = json.dumps(request_input)
             req = requests.post(f'{api_url}/tags', headers=headers, data=json_input, timeout=10)
-    finally:
+    except KeyError:
         ...
 
 # The data to be sent alongside the file
